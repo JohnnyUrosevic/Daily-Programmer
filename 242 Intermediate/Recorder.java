@@ -6,10 +6,12 @@ import java.io.FileNotFoundException;
 class Show {
 	public int start;
 	public int end;
+	public String name;
 
-	public Show(int s, int e) {
+	public Show(int s, int e, String n) {
 		start = s;
 		end = e;
+		name = n;
 	}
 }
 
@@ -26,7 +28,9 @@ class Show {
 			}
 		 }
 
-		 System.out.println(shows.size());
+		 for (Show s : shows) {
+			 System.out.println(s.name);
+		 }
 	 }
 
 	 public static void readInput(String file) {
@@ -35,14 +39,14 @@ class Show {
 
 			 int start;
 			 int end;
+			 String name;
 
 			 while(s.hasNext()) {
 				 start = s.nextInt();
 				 end = s.nextInt();
+				 name = s.nextLine();
 
-				 System.out.println(s.nextLine());
-
-				 shows.add(new Show(start, end));
+				 shows.add(new Show(start, end, name));
 			 }
 		 }
 	 	catch(FileNotFoundException e) {
