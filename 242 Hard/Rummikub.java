@@ -5,31 +5,68 @@ import java.util.ArrayList;
 
 public class Rummikub {
 	private static ArrayList<Tile> tiles = new ArrayList<>();
-	private static ArrayList<ArrayList<Tile>> runs = new ArrayList<>();
+
+	private static ArrayList<ArrayList<Tile>> runs   = new ArrayList<>();
+	private static ArrayList<ArrayList<Tile>> groups = new ArrayList<>();
 
 	public static void main(String[] args) {
 		readInput("input.text");
 
 		tiles.sort((a,b) -> a.num - b.num);
 
+		//create arrays for each color
 		ArrayList<Tile> black  = new ArrayList<>(tiles);
 		ArrayList<Tile> yellow = new ArrayList<>(tiles);
 		ArrayList<Tile> red    = new ArrayList<>(tiles);
 		ArrayList<Tile> purple = new ArrayList<>(tiles);
 
-		black.removeIf(a -> a.char != 'b');
-		yellow.removeIf(a -> a.char != 'y');
-		red.removeIf(a -> a.char != 'r');
-		purple.removeIf(a -> a.char != 'p');
+		black.removeIf(a -> a.color != 'B');
+		yellow.removeIf(a -> a.color != 'Y');
+		red.removeIf(a -> a.color != 'R');
+		purple.removeIf(a -> a.color != 'P');
 
-		
+		//runs
+		createRuns(black);
+		createRuns(yellow);
+		createRuns(red);
+		createRuns(purple);
+
+		runs.removeIf(a -> a.size() < 3);
+
+		//groups
+		createGroups(black);
+		createGroups(yellow);
+		createGroups(red);
+		createGroups(purple);
+
+		for (ArrayList<Tile> tileList : runs) {
+			for (Tile t : tileList) {
+				System.out.print(t.color + "" + t.num + " ");
+			}
+			System.out.println();
+		}
 	}
 
 	public static void createRuns(ArrayList<Tile> tiles) {
+		if (tiles.size() < 3) return; //not possible to make a run with less than 3 tiles
+
 		ArrayList<Tile> run = new ArrayList<>();
-		for (int i = 0; i < tiles.size(); i++) {
-			//TODO add runs to arraylist and push to main list
+		run.add(tiles.get(0));
+		for (int i = 1; i < tiles.size(); i++) {
+			if (tiles.get(i-1).num == tiles.get(i).num - 1) {
+				run.add(tiles.get(i));
+			}
+			else {
+				runs.add(run); //add created run to main ArrayList
+				run = new ArrayList<>(); //clear run
+				run.add(tiles.get(i));
+			}
 		}
+		runs.add(run);
+	}
+
+	public static void createGroups(ArrayList<Tile> tiles) {
+		
 	}
 
 	public static void readInput(String file) {
