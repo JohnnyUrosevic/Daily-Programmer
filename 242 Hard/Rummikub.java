@@ -34,12 +34,18 @@ public class Rummikub {
 		runs.removeIf(a -> a.size() < 3);
 
 		//groups
-		createGroups(black);
-		createGroups(yellow);
-		createGroups(red);
-		createGroups(purple);
+		createGroups();
+
+		groups.removeIf(a -> a.size() < 3);
 
 		for (ArrayList<Tile> tileList : runs) {
+			for (Tile t : tileList) {
+				System.out.print(t.color + "" + t.num + " ");
+			}
+			System.out.println();
+		}
+
+		for (ArrayList<Tile> tileList : groups) {
 			for (Tile t : tileList) {
 				System.out.print(t.color + "" + t.num + " ");
 			}
@@ -65,8 +71,20 @@ public class Rummikub {
 		runs.add(run);
 	}
 
-	public static void createGroups(ArrayList<Tile> tiles) {
-		
+	public static void createGroups() {
+		ArrayList<Tile> group = new ArrayList<>();
+		group.add(tiles.get(0));
+		for (int i = 1; i < tiles.size(); i++) {
+			if (tiles.get(i-1).num == tiles.get(i).num) {
+				group.add(tiles.get(i));
+			}
+			else {
+				groups.add(group); //add created group to main ArrayList
+				group = new ArrayList<>(); //clear group
+				group.add(tiles.get(i));
+			}
+		}
+		groups.add(group);
 	}
 
 	public static void readInput(String file) {
