@@ -4,7 +4,8 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 public class Rummikub {
-	private static ArrayList<Tile> tiles = new ArrayList<>();
+	private static ArrayList<Tile> tiles  = new ArrayList<>();
+	private static ArrayList<Tile> played = new ArrayList<>();
 
 	private static ArrayList<ArrayList<Tile>> runs   = new ArrayList<>();
 	private static ArrayList<ArrayList<Tile>> groups = new ArrayList<>();
@@ -12,31 +13,20 @@ public class Rummikub {
 	public static void main(String[] args) {
 		readInput("input.text");
 
-		tiles.sort((a,b) -> a.num - b.num);
+		generatePlay();
 
-		//create arrays for each color
-		ArrayList<Tile> black  = new ArrayList<>(tiles);
-		ArrayList<Tile> yellow = new ArrayList<>(tiles);
-		ArrayList<Tile> red    = new ArrayList<>(tiles);
-		ArrayList<Tile> purple = new ArrayList<>(tiles);
+		int value = getPlayValue();
 
-		black.removeIf(a -> a.color != 'B');
-		yellow.removeIf(a -> a.color != 'Y');
-		red.removeIf(a -> a.color != 'R');
-		purple.removeIf(a -> a.color != 'P');
+		if (value < 30) {
+			System.out.println("No possible play, grabbing more tiles");
+		}
+		while (value < 30) {
+			tiles.add(generateTile());
 
-		//runs
-		createRuns(black);
-		createRuns(yellow);
-		createRuns(red);
-		createRuns(purple);
+			generatePlay();
 
-		runs.removeIf(a -> a.size() < 3);
-
-		//groups
-		createGroups();
-
-		groups.removeIf(a -> a.size() < 3);
+			value = getPlayValue();
+		}
 
 		for (ArrayList<Tile> tileList : runs) {
 			for (Tile t : tileList) {
@@ -85,6 +75,104 @@ public class Rummikub {
 			}
 		}
 		groups.add(group);
+	}
+
+	public static int getPlayValue() {
+		int total = 0;
+		for (ArrayList<Tile> tileList : runs) {
+			for (Tile t : tileList) {
+				total += t.num;
+			}
+		}
+
+		for (ArrayList<Tile> tileList : groups) {
+			for (Tile t : tileList) {
+				total += t.num;
+			}
+		}
+		return total;
+	}
+
+	public static Tile generateTile() {
+		char color;
+		int num;
+		int count;
+
+		do {
+			int rand = (int) (Math.random() * 4 + 1);
+
+			switch(rand) {
+				case 1: color = 'B';
+						break;
+				case 2: color = 'R';
+						break;
+				case 3: color = 'Y';
+						break;
+				default:color = 'P';
+						break;
+			}
+
+			num = (int) (Math.random() * 13 + 1);
+
+			count = 0;
+			for (Tile t : tiles) {
+				if (t.num == num && t.color == color) {
+					count++;
+				}
+			}
+		}
+		while(count == 2);
+
+		System.out.println("Grabbed " + color + "" + num);
+		return new Tile(color, num);
+	}
+
+	public static void generatePlay() {
+				groups.clear();
+				runs.clear();
+
+				for (Tile t : played) {
+					tiles.add(t);
+				}
+				played.clear();
+
+				tiles.sort((a,b) -> a.num - b.num);
+
+				//groups
+				createGroups();
+				groups.removeIf(a -> a.size() < 3);
+
+				for (ArrayList<Tile> tileList : groups) {
+					for (Tile t : tileList) {
+						played.add(t);
+						tiles.remove(t);
+					}
+				}
+				//runs
+				//create arrays for each color
+				ArrayList<Tile> black  = new ArrayList<>(tiles);
+				ArrayList<Tile> yellow = new ArrayList<>(tiles);
+				ArrayList<Tile> red    = new ArrayList<>(tiles);
+				ArrayList<Tile> purple = new ArrayList<>(tiles);
+
+				black.removeIf(a -> a.color != 'B');
+				yellow.removeIf(a -> a.color != 'Y');
+				red.removeIf(a -> a.color != 'R');
+				purple.removeIf(a -> a.color != 'P');
+
+				createRuns(black);
+				createRuns(yellow);
+				createRuns(red);
+				createRuns(purple);
+
+				runs.removeIf(a -> a.size() < 3);
+
+				for (ArrayList<Tile> tileList : runs) {
+					for (Tile t : tileList) {
+						played.add(t);
+						tiles.remove(t);
+					}
+				}
 	}
 
 	public static void readInput(String file) {
