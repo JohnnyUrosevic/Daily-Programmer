@@ -127,52 +127,69 @@ public class Rummikub {
 		return new Tile(color, num);
 	}
 
+	public static void playGroups() {
+		createGroups();
+		groups.removeIf(a -> a.size() < 3);
+
+		for (ArrayList<Tile> tileList : groups) {
+			for (Tile t : tileList) {
+				played.add(t);
+				tiles.remove(t);
+			}
+		}
+	}
+
+	public static void playRuns() {
+		//create lists for each color
+		ArrayList<Tile> black  = new ArrayList<>(tiles);
+		ArrayList<Tile> yellow = new ArrayList<>(tiles);
+		ArrayList<Tile> red    = new ArrayList<>(tiles);
+		ArrayList<Tile> purple = new ArrayList<>(tiles);
+
+		black.removeIf(a -> a.color != 'B');
+		yellow.removeIf(a -> a.color != 'Y');
+		red.removeIf(a -> a.color != 'R');
+		purple.removeIf(a -> a.color != 'P');
+
+		createRuns(black);
+		createRuns(yellow);
+		createRuns(red);
+		createRuns(purple);
+
+		runs.removeIf(a -> a.size() < 3);
+
+		for (ArrayList<Tile> tileList : runs) {
+			for (Tile t : tileList) {
+				played.add(t);
+				tiles.remove(t);
+			}
+		}
+	}
+
 	public static void generatePlay() {
-				groups.clear();
-				runs.clear();
+				resetHand();
 
-				for (Tile t : played) {
-					tiles.add(t);
+				playGroups();
+				playRuns();
+
+				if (getPlayValue() < 30) { //if value is less than 30, try creating runs then groups
+					resetHand();
+
+					playRuns();
+					playGroups();
 				}
-				played.clear();
+	}
 
-				tiles.sort((a,b) -> a.num - b.num);
+	public static void resetHand() {
+		groups.clear();
+		runs.clear();
 
-				//groups
-				createGroups();
-				groups.removeIf(a -> a.size() < 3);
+		for (Tile t : played) {
+			tiles.add(t);
+		}
+		played.clear();
 
-				for (ArrayList<Tile> tileList : groups) {
-					for (Tile t : tileList) {
-						played.add(t);
-						tiles.remove(t);
-					}
-				}
-				//runs
-				//create arrays for each color
-				ArrayList<Tile> black  = new ArrayList<>(tiles);
-				ArrayList<Tile> yellow = new ArrayList<>(tiles);
-				ArrayList<Tile> red    = new ArrayList<>(tiles);
-				ArrayList<Tile> purple = new ArrayList<>(tiles);
-
-				black.removeIf(a -> a.color != 'B');
-				yellow.removeIf(a -> a.color != 'Y');
-				red.removeIf(a -> a.color != 'R');
-				purple.removeIf(a -> a.color != 'P');
-
-				createRuns(black);
-				createRuns(yellow);
-				createRuns(red);
-				createRuns(purple);
-
-				runs.removeIf(a -> a.size() < 3);
-
-				for (ArrayList<Tile> tileList : runs) {
-					for (Tile t : tileList) {
-						played.add(t);
-						tiles.remove(t);
-					}
-				}
+		tiles.sort((a,b) -> a.num - b.num);
 	}
 
 	public static void readInput(String file) {
